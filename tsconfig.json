@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es6",
     "module":"es2015",
     "lib": ["es2015", "es2016", "es2017", "dom"],
     "strict": true,
@@ -14,7 +14,8 @@
     "outDir": "dist/lib",
     "typeRoots": [
       "node_modules/@types"
-    ]
+    ],
+    "downlevelIteration": true
   },
   "include": [
     "src"
