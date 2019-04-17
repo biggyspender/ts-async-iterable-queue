@@ -4,3 +4,4 @@ if (!Symbol.asyncIterator) {
   ;(Symbol as any)[aiKey] = Symbol.for('Symbol.asyncIterator')
 }
 export { createAsyncQueue } from './createAsyncQueue'
+export { createQueue } from './createQueue'
