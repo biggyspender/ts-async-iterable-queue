@@ -4,8 +4,7 @@ export interface Queue<T> {
   readonly length: number
 }
 
-export function createQueue<T>(): Queue<T> {
-  const trimLimit = 10000
+export function createQueue<T>(trimLimit = 10000): Queue<T> {
   const store: T[] = []
   let front = 0
   let end = 0

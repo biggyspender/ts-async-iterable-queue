@@ -2,7 +2,7 @@ import { createQueue } from '../src/createQueue'
 
 describe('createQueue', () => {
   it('trims correctly', () => {
-    const q = createQueue<number>()
+    const q = createQueue<number>(9999)
     for (let i = 0; i < 10000000; ++i) {
       q.enqueue(i)
       if (q.dequeue() !== i) throw Error()
