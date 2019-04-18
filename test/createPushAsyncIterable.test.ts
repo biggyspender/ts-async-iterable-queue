@@ -1,4 +1,4 @@
-import { createPushAsyncIterable } from '../src/createPushAsyncIterable'
+import { createPushAsyncIterable } from '../src/ts-async-iterable-queue'
 describe('createPushAsyncIterable', () => {
   it('works', async () => {
     const q = createPushAsyncIterable<number>((next, complete, error, addCompletionHandler) => {

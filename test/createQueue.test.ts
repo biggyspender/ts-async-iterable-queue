@@ -1,4 +1,4 @@
-import { createQueue } from '../src/createQueue'
+import { createQueue } from '../src/ts-async-iterable-queue'
 
 describe('createQueue', () => {
   it('trims correctly', () => {
