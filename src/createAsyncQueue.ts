@@ -1,18 +1,21 @@
-import { IteratorResultResolver } from './IteratorResultResolver'
-import { ResultWaitingForResolver } from './ResultWaitingForResolver'
 import { createPromiseResolver } from './createPromiseResolver'
 import { AsyncIterableQueue } from './AsyncIterableQueue'
 import { Queue, createQueue } from './createQueue'
+import { PromiseResolver } from './PromiseResolver'
 export function createAsyncQueue<T>(): AsyncIterableQueue<T> {
-  const pendingResolvers: Queue<IteratorResultResolver<T>> = createQueue()
-  const resultsWaitingForResolvers: Queue<ResultWaitingForResolver<T>> = createQueue()
-  const next = () => {
+  const pendingResolvers: Queue<PromiseResolver<IteratorResult<T>>> = createQueue()
+  const resultsWaitingForResolvers: Queue<
+    PromiseResolver<PromiseResolver<IteratorResult<T>>>
+  > = createQueue()
+  const next = (): Promise<IteratorResult<T>> => {
     const pr = createPromiseResolver<IteratorResult<T>>()
     if (resultsWaitingForResolvers.length > 0) {
-      const f: ResultWaitingForResolver<T> = resultsWaitingForResolvers.dequeue()!
-      f(pr.resolve)
+      const f: PromiseResolver<
+        PromiseResolver<IteratorResult<T>>
+      > = resultsWaitingForResolvers.dequeue()!
+      f.resolve(pr)
     } else {
-      pendingResolvers.enqueue(pr.resolve)
+      pendingResolvers.enqueue(pr)
     }
     return pr.promise
   }
@@ -23,24 +26,30 @@ export function createAsyncQueue<T>(): AsyncIterableQueue<T> {
     }
     return result.value
   }
-  const getNextResultResolver = async () => {
+  const getNextResultResolver = async (): Promise<PromiseResolver<IteratorResult<T>>> => {
     if (pendingResolvers.length > 0) {
       const resolver = pendingResolvers.dequeue()!
       return resolver
     } else {
-      const pr = createPromiseResolver<IteratorResultResolver<T>>()
-      resultsWaitingForResolvers.enqueue(pr.resolve)
+      const pr = createPromiseResolver<PromiseResolver<IteratorResult<T>>>()
+      resultsWaitingForResolvers.enqueue(pr)
       return pr.promise
     }
   }
-  const enqueue = async (value: T) => {
+  const enqueue = async (value: T): Promise<void> => {
     const resolveResult = await getNextResultResolver()
-    resolveResult({ value, done: false })
+    resolveResult.resolve({ value, done: false })
   }
-  const complete = async () => {
+  const complete = async (): Promise<void> => {
     const resolveResult = await getNextResultResolver()
-    resolveResult({ done: true } as IteratorResult<T>)
+    resolveResult.resolve({ done: true } as IteratorResult<T>)
   }
+
+  const error = async (reason?: any): Promise<void> => {
+    const resolveResult = await getNextResultResolver()
+    resolveResult.reject(reason)
+  }
+
   return {
     [Symbol.asyncIterator](): AsyncIterableIterator<T> {
       return this
@@ -48,6 +57,7 @@ export function createAsyncQueue<T>(): AsyncIterableQueue<T> {
     next,
     dequeue,
     enqueue,
-    complete
+    complete,
+    error
   }
 }

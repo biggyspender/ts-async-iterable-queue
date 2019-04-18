@@ -5,3 +5,4 @@ if (!Symbol.asyncIterator) {
 }
 export { createAsyncQueue } from './createAsyncQueue'
 export { createQueue } from './createQueue'
+export { createPushAsyncIterable } from './createPushAsyncIterable'
