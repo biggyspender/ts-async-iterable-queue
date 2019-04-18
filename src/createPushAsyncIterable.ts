@@ -1,17 +1,22 @@
 import { createAsyncQueue } from './createAsyncQueue'
 
-export async function* createPushAsyncIterable<T>(
-  subscriber: (
-    next: (item: T) => void,
-    complete: () => void,
-    error: (reason: any) => void,
-    addCompletionHandler: (handler: () => void) => void
-  ) => void
-) {
+interface Subscription<T> {
+  next: (item: T) => void
+  complete: () => void
+  error: (reason: any) => void
+  addCompletionHandler: (handler: () => void) => void
+}
+
+export async function* createPushAsyncIterable<T>(subscriber: (s: Subscription<T>) => void) {
   const q = createAsyncQueue<T>()
   const unsubscriptions: (() => void)[] = []
 
-  subscriber(q.enqueue, q.complete, q.error, (handler: () => void) => unsubscriptions.push(handler))
+  subscriber({
+    next: q.enqueue,
+    complete: q.complete,
+    error: q.error,
+    addCompletionHandler: (handler: () => void) => unsubscriptions.push(handler)
+  })
   try {
     for await (const x of q) {
       yield x
