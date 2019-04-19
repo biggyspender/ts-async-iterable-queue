@@ -1,11 +1,5 @@
 import { createAsyncQueue } from './createAsyncQueue'
-
-interface Subscription<T> {
-  next: (item: T) => void
-  complete: () => void
-  error: (reason: any) => void
-  addCompletionHandler: (handler: () => void) => void
-}
+import { Subscription } from './Subscription'
 
 export async function* createPushAsyncIterable<T>(subscriber: (s: Subscription<T>) => void) {
   const q = createAsyncQueue<T>()
