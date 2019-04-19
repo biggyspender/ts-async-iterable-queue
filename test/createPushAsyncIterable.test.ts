@@ -11,7 +11,7 @@ describe('createPushAsyncIterable', () => {
     }
     expect(a).toEqual([1])
   })
-  it('works', async () => {
+  it('works2', async () => {
     const q = createPushAsyncIterable<number>(({ next, error }) => {
       next(1)
       error(Error('woo'))
@@ -29,7 +29,7 @@ describe('createPushAsyncIterable', () => {
     }
     expect(a).toEqual([1])
   })
-  it('works', async () => {
+  it('works3', async () => {
     let isCompleted = false
     const q = createPushAsyncIterable<number>(({ next, complete, addCompletionHandler }) => {
       next(1)
@@ -45,7 +45,7 @@ describe('createPushAsyncIterable', () => {
     expect(isCompleted).toBeTruthy()
     expect(a).toEqual([1])
   })
-  it('works', async () => {
+  it('works4', async () => {
     let isCompleted = false
     const q = createPushAsyncIterable<number>(({ next, error, addCompletionHandler }) => {
       next(1)
@@ -65,7 +65,22 @@ describe('createPushAsyncIterable', () => {
     expect(isCompleted).toBeTruthy()
     expect(a).toEqual([1])
   })
-  it('works', async () => {
+  it('works5', async () => {
+    let isCompleted = false
+    const q = createPushAsyncIterable<number>(({ next, addCompletionHandler }) => {
+      next(1)
+      next(1)
+      next(1)
+
+      addCompletionHandler(() => (isCompleted = true))
+    })
+
+    for await (const _ of q) {
+      break
+    }
+    expect(isCompleted).toBeTruthy()
+  })
+  it('works6', async () => {
     let isCompleted = false
     const q = createPushAsyncIterable<number>(({ next, addCompletionHandler }) => {
       next(1)
