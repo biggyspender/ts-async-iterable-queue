@@ -55,9 +55,13 @@ export async function* createPushAsyncIterable<T>(
       pushQueue.enqueue(Promise.reject(reason))
     }
   }
+  let unsubscribed = false
   const unsubscribe = () => {
-    done = true
-    completionHandlers.forEach(c => c())
+    if (!unsubscribed) {
+      done = true
+      unsubscribed = true
+      completionHandlers.forEach(c => c())
+    }
   }
 
   sub({ next: pushValue, complete, error, addCompletionHandler: h => completionHandlers.push(h) })

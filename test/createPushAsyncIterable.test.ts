@@ -32,10 +32,10 @@ describe('createPushAsyncIterable', () => {
   it('works3', async () => {
     let isCompleted = false
     const q = createPushAsyncIterable<number>(({ next, complete, addCompletionHandler }) => {
+      addCompletionHandler(() => (isCompleted = true))
       next(1)
       complete()
       expect(addCompletionHandler).toBeDefined()
-      addCompletionHandler(() => (isCompleted = true))
     })
 
     const a: number[] = []
@@ -48,9 +48,9 @@ describe('createPushAsyncIterable', () => {
   it('works4', async () => {
     let isCompleted = false
     const q = createPushAsyncIterable<number>(({ next, error, addCompletionHandler }) => {
+      addCompletionHandler(() => (isCompleted = true))
       next(1)
       error(Error('woo'))
-      addCompletionHandler(() => (isCompleted = true))
     })
 
     const a: number[] = []
